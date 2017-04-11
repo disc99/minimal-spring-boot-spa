@@ -1,0 +1,1 @@
+# minimal-spring-boot-spa

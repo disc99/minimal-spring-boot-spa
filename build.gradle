@@ -26,7 +26,13 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	runtime('org.springframework.boot:spring-boot-devtools')
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '3.5'
+	distributionUrl = 'http://services.gradle.org/distributions/gradle-3.5-all.zip'
 }

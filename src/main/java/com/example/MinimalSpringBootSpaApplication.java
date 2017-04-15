@@ -10,8 +10,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse;
 
@@ -23,6 +31,22 @@ public class MinimalSpringBootSpaApplication {
     }
 }
 
+@RestController
+@RequestMapping("/api")
+class ApiController {
+    @GetMapping("/user")
+    Principal user(Principal user) {
+        return user;
+    }
+    @GetMapping("/resource")
+    public Map<String, Object> home() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("id", UUID.randomUUID().toString());
+        model.put("content", "Hello World");
+        return model;
+    }
+}
+
 @Configuration
 @EnableWebSecurity
 class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -30,15 +54,10 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .httpBasic().and()
                 .authorizeRequests()
-                    .anyRequest().authenticated()
-                    .and()
-                .formLogin()
-                    .loginPage("/login")
-                    .permitAll()
-                    .and()
-                .logout()
-                    .permitAll()
+                    .antMatchers("/admin/**").permitAll()
+                    .antMatchers("/api/**").authenticated()
                     .and()
                 .csrf()
                     .csrfTokenRepository(withHttpOnlyFalse());
@@ -48,6 +67,7 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
+                .withUser("root").password("root").roles("ROOT").and()
                 .withUser("user").password("password").roles("USER");
     }
 }
@@ -57,7 +77,6 @@ class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("login");
-        registry.addViewController("/admin/**").setViewName("admin");
+        registry.addViewController("/admin/**").setViewName("forward:/admin.html");
     }
 }

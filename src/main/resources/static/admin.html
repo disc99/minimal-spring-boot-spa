@@ -16,13 +16,15 @@
 
 <script>
     function logout() {
-        axios.post('/logout')
-          .then(function (response) {
+        axios.post("/logout", {}, {
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(function (response) {
             console.log(response);
-          })
-          .catch(function (error) {
+        })
+        .catch(function (error) {
             console.log(error);
-          });
+        });
     }
 
     function loginOk() {
